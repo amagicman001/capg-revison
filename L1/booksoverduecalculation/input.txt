@@ -1,0 +1,16 @@
+LIBRARY/0001:To Kill a Mockingbird:Harper Lee:1960-07-11:Fiction:5
+LIBRARY/0002:1984:George Orwell:1949-06-08:Non-Fiction:2
+LIBRARY/0003:Harry Potter and the Philosopher's Stone:J.K. Rowling:1997-06-26:Children:7
+LIBRARY/0004:The Great Gatsby:F. Scott Fitzgerald:1925-04-10:Fiction:10
+LIBRARY/0005:The Catcher in the Rye:J.D. Salinger:1951-07-16:Fiction:0
+LIBRARY/0006:Pride and Prejudice:Jane Austen:1813-01-28:Fiction:3
+LIBRARY/0007:The Hobbit:J.R.R. Tolkien:1937-09-21:Children:8
+LIBRARY/0008:Moby Dick:Herman Melville:1851-10-18:Fiction:1
+LIBRARY/0009:War and Peace:Leo Tolstoy:1869-01-01:Non-Fiction:4
+LIBRARY/0010:The Odyssey:Homer:1980-01-01:Non-Fiction:6
+LIBRARY/0011:Little Women:Louisa May Alcott:1868-09-30:Children:0
+LIBRARY/0012:Crime and Punishment:Fyodor Dostoevsky:1866-01-01:Fiction:9
+LIBRARY/0013:The Kite Runner:Khaled Hosseini:2003-05-29:Fiction:0
+LIBRARY/0014:Jane Eyre:Charlotte Brontë:1847-10-16:Fiction:4
+LIBRARY/0015:The Adventures of Huckleberry Finn:Mark Twain:1884-12-10:Children:12
+
