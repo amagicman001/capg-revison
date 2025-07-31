@@ -29,3 +29,19 @@ Coordinated with placement-registered students to understand job preferences and
 Helped curate lists of preferred companies, job roles, and skillsets, and promoted upskilling platforms.
 
 Assisted in promoting alumni success stories and identifying new companies for campus drives.
+
+
+
+
+Deployed a Full-Stack Chat Application on Kubernetes Using Minikube
+Dec 2024
+
+Built and pushed Docker images of frontend/backend to DockerHub.
+
+Applied Kubernetes manifests: deployments, services, volumes, secrets.
+
+Used Persistent Volumes for MongoDB and secured backend via secrets.
+
+Hosted app locally with custom domain using /etc/hosts.
+
+Hands-on with kubectl, YAML, Docker, and Minikube.
