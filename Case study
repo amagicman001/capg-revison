@@ -1,0 +1,978 @@
+Project1
+
+•	Java17
+
+sudo apt update
+
+sudo apt install openjdk-17-jdk -y
+
+java -version
+
+•	Jenkins
+
+curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key | sudo tee \
+
+/usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+
+https://pkg.jenkins.io/debian binary/ | sudo tee \
+
+/etc/apt/sources.list.d/jenkins.list > /dev/null
+
+•	update
+
+sudo apt update
+
+sudo apt install jenkins -y
+
+sudo nano /etc/default/Jenkins
+
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
+•	Fix ownership and permissions
+
+Set Jenkins directory ownership
+
+sudo chown -R jenkins:jenkins /var/lib/jenkins
+
+sudo chown -R jenkins:jenkins /var/log/jenkins
+
+sudo chown -R jenkins:jenkins /var/cache/jenkins
+
+Set reasonable permissions
+
+sudo chmod -R 755 /var/lib/jenkins
+
+sudo chmod -R 755 /var/log/jenkins
+
+sudo chmod -R 755 /var/cache/jenkins
+
+•	Enable and strat Jenkins
+
+sudo systemctl daemon-reexec
+
+sudo systemctl enable jenkins
+
+sudo systemctl start Jenkins
+
+sudo systemctl status Jenkins
+
+STEP 8: Allow Port 8080 (if using AWS EC2)
+
+•	Go to your EC2 console.
+
+•	Select the instance → Security Groups → Edit inbound rules
+
+•	Add rule:
+
+o	Type: HTTP
+
+o	Port: 8080
+
+o	Source: Anywhere (0.0.0.0/0)
+
+•	Maven installation
+
+sudo apt update
+
+sudo apt install maven -y
+
+mvn -version
+
+•	Maven environment variable setup
+
+sudo nano /etc/profile.d/maven.sh
+
+export M2_HOME=/usr/share/maven
+
+export MAVEN_HOME=/usr/share/maven
+
+export PATH=${M2_HOME}/bin:${PATH}
+
+sudo chmod +x /etc/profile.d/maven.sh
+
+source /etc/profile.d/maven.sh
+
+•	Also install docker.io -y in the Jenkins-maven instance
+
+Jenkins dashboard
+
+•	Plugins
+
+-- Maven Integration
+
+Docker—api,pipeline,commons
+
+Step 2: Configure Maven in Jenkins
+
+1. Go to Manage Jenkins → Global Tool Configuration
+
+
+2. Scroll to Maven
+
+
+3. Click Add Maven → Name it (e.g., maven-3)
+
+
+4. Uncheck Install automatically (since you've already installed Maven on your system)
+
+
+5. Set path: /usr/share/maven
+
+
+6. Save
+
+
+
+[Jenkins + Maven (Instance 1)]
+
+|
+
+     | SSH / Docker TCP
+
+     ↓
+
+[ Docker Host (Instance 2) ]
+
+INSTANCE2
+
+•	Create a docker instance and connect it with the instance1
+
+🧰 Step-by-Step Setup Guide
+
+🔹 Step 1: Prepare Instance 2 (Docker Host)
+
+On Instance 2 (Docker machine):
+
+bash
+
+Copy code
+
+sudo apt update
+
+sudo apt install docker.io -y
+
+sudo systemctl start docker
+
+sudo systemctl enable docker
+
+sudo usermod -aG docker $USER
+
+Log out and back in, or:
+
+bash
+
+Copy code
+
+newgrp docker
+
+✅ Test:
+
+bash
+
+Copy code
+
+docker run hello-world
+
+
+---
+
+🔹 Step 2: Allow Remote Access to Docker (TCP Socket)
+
+⚠️ WARNING: Only for internal/secured environments. Use a private IP.
+
+1. Edit Docker service file:
+
+
+
+bash
+
+Copy code
+
+sudo nano /lib/systemd/system/docker.service
+
+2. Find the line starting with ExecStart= and replace it like this:
+
+
+
+bash
+
+Copy code
+
+ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375
+
+3. Reload and restart Docker:
+
+
+
+bash
+
+Copy code
+
+sudo systemctl daemon-reexec
+
+sudo systemctl daemon-reload
+
+sudo systemctl restart docker
+
+4. Allow port 2375 in the instance’s security group (AWS: Inbound rule → Custom TCP → 2375)
+
+
+5. ✅ Test from Instance 1:
+
+
+
+bash
+
+Copy code
+
+curl http://<docker-instance-private-ip>:2375/version
+
+
+---
+
+🔹 Step 3: Install Docker Plugin in Jenkins (Instance 1)
+
+1. Go to Manage Jenkins → Plugin Manager
+
+
+2. Install:
+
+
+
+o	Docker Pipeline
+
+o	Docker Commons
+
+o	Docker plugin
+
+PIPELINE:
+
+Inside the Jenkins go to credential then system and set the credential of the dockerhub of yours:
+
+Now create a pipeline:
+
+pipeline {
+
+agent any
+
+
+
+environment {
+
+    DOCKER_HOST = "tcp://172.31.39.89:2375"
+
+    IMAGE_NAME = "amand0125/hello-world"
+
+    DOCKER_CREDENTIALS_ID = "f3a75b4e-669e-4bda-8a2a-2c0845868522"  // replace this ID
+
+}
+
+
+
+stages {
+
+    stage('Clone from GitHub') {
+
+        steps {
+
+            git 'https://github.com/amagicman001/hello-world.git'
+
+        }
+
+    }
+
+
+
+    stage('Build with Maven') {
+
+        steps {
+
+            sh 'mvn clean install'
+
+        }
+
+    }
+
+
+
+    stage('Build Docker Image') {
+
+        steps {
+
+            sh 'docker build -t $IMAGE_NAME .'
+
+        }
+
+    }
+
+
+
+    stage('Login to Docker Hub') {
+
+        steps {
+
+            withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+
+                sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+
+            }
+
+        }
+
+    }
+
+
+
+    stage('Push Docker Image') {
+
+        steps {
+
+            sh 'docker push $IMAGE_NAME'
+
+        }
+
+    }
+
+}
+
+
+
+post {
+
+    success {
+
+        echo "Pipeline completed successfully!"
+
+    }
+
+    failure {
+
+        echo "Pipeline failed!"
+
+    }
+
+}
+
+}
+
+•	Build it then go back to the instance 2 of docker and run this on the port 8080…..allow inbound rules with 2375 for the ssh with the instance1 and then 8080 to access the tomcat server where you will get the project by doing /webapp
+
+Ansible Integration with Kubernetes
+
+•	Start with creating two instances for ansible and Kuber then move to the ssh part.
+
+Kubernetes
+
+🧰 Step 1: Install Dependencies
+
+1. SSH into the new instance, then run:
+
+
+
+bash
+
+Copy code
+
+sudo apt update
+
+sudo apt install -y curl apt-transport-https conntrack docker.io
+
+sudo systemctl enable --now docker
+
+sudo usermod -aG docker $USER
+
+
+---
+
+🔧 Step 2: Install kubectl & Minikube
+
+1. Install kubectl:
+
+
+
+bash
+
+Copy code
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+chmod +x kubectl
+
+sudo mv kubectl /usr/local/bin/
+
+kubectl version --client
+
+2. Install Minikube:
+
+
+
+bash
+
+Copy code
+
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+
+chmod +x minikube
+
+sudo mv minikube /usr/local/bin/
+
+minikube version
+
+
+---
+
+▶️ Step 3: Start Minikube Cluster
+
+bash
+
+Copy code
+
+minikube start --driver=docker
+
+Verify cluster and nodes:
+
+bash
+
+Copy code
+
+kubectl get nodes
+
+Ansible
+
+Install Required Packages
+
+🧩 On Ansible Instance:
+
+bash
+
+Copy code
+
+sudo apt update
+
+sudo apt install -y ansible
+
+ansible -–version
+
+•	SSH CONNECTION
+
+1. Give instance 1 jenkins user the sudo rights
+
+
+
+•  Edit the sudoers file safely using visudo:
+
+sudo visudo
+
+•  Add this line at the end of the file to grant full sudo privileges to the jenkins user:
+
+jenkins ALL=(ALL) NOPASSWD:ALL
+
+✅ How to verify jenkins user has sudo rights
+
+Now that jenkins is the user, to test whether it can run sudo commands, do this:
+
+sudo -u jenkins sudo whoami
+
+If the user has sudo privileges with no password prompt (NOPASSWD), the output will be:
+
+root
+
+•	At INSTANCE1 and INSTANCE2 create a file keypairname.pem and paste the content s of pem file there……give -------sudo chmod 400   name.pem permission
+
+3. Test SSH from instance1 → instance2 (manual check)
+
+
+
+From instance1:
+
+ssh -i /home/ubuntu/prj.pem ubuntu@instance-2-private ip
+
+✅ If this logs you into instance2, then the basic connection is working.
+
+If using a different AMI, adjust the username (ubuntu, ec2-user, etc.).
+
+4. Add SSH credentials to Jenkins
+
+
+
+In Jenkins:
+
+•	Go to Manage Jenkins → Credentials → (global) → Add Credentials
+
+•	Type: SSH Username with private key
+
+o	Username: ubuntu
+
+o	Private Key: Enter directly → paste contents of prj.pem
+
+o	ID: instance2-ssh (or any ID)
+
+o	Description: SSH to Docker host instance2
+
+•
+
+PIPELINE FOR SSH
+
+……have a folder mkdir -p /tmp/app on docker instance
+
+pipeline {
+
+agent any
+
+
+
+environment {
+
+    IMAGE_NAME = "amand0125/hello-world"
+
+    DOCKER_CREDENTIALS_ID = "40db1352-2acf-437d-a793-4b39eeaea40d"  // same as before
+
+    REMOTE_DOCKER_HOST = "ubuntu@172.31.41.185" // your Docker host private IP via SSH
+
+    SSH_KEY_CREDENTIALS_ID = "instance2-ssh"    // the SSH key ID added in Jenkins
+
+}
+
+
+
+stages {
+
+    stage('Clone from GitHub') {
+
+        steps {
+
+            git 'https://github.com/amagicman001/hello-world.git'
+
+        }
+
+    }
+
+
+
+    stage('Build with Maven') {
+
+        steps {
+
+            sh 'mvn clean install'
+
+        }
+
+    }
+
+
+
+    stage('Build Docker Image on Remote') {
+
+        steps {
+
+            sshagent (credentials: [env.SSH_KEY_CREDENTIALS_ID]) {
+
+                sh """
+
+                    scp -o StrictHostKeyChecking=no -r * ${env.REMOTE_DOCKER_HOST}:/tmp/app
+
+                    ssh -o StrictHostKeyChecking=no ${env.REMOTE_DOCKER_HOST} '
+
+                        cd /tmp/app &&
+
+                        docker build -t ${env.IMAGE_NAME} .
+
+                    '
+
+                """
+
+            }
+
+        }
+
+    }
+
+
+
+    stage('Login to Docker Hub from Remote') {
+
+        steps {
+
+            sshagent (credentials: [env.SSH_KEY_CREDENTIALS_ID]) {
+
+                withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+
+                    sh """
+
+                        ssh -o StrictHostKeyChecking=no ${env.REMOTE_DOCKER_HOST} '
+
+                            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+
+                        '
+
+                    """
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+
+    stage('Push Docker Image from Remote') {
+
+        steps {
+
+            sshagent (credentials: [env.SSH_KEY_CREDENTIALS_ID]) {
+
+                sh """
+
+                    ssh -o StrictHostKeyChecking=no ${env.REMOTE_DOCKER_HOST} '
+
+                        docker push ${env.IMAGE_NAME}
+
+                    '
+
+                """
+
+            }
+
+        }
+
+    }
+
+}
+
+
+
+post {
+
+    success {
+
+        echo "Pipeline completed successfully!"
+
+    }
+
+    failure {
+
+        echo "Pipeline failed!"
+
+    }
+
+}
+
+}
+
+In the ansible have inventory.ini and deploy_app.yaml a folder having
+
+/home/ubuntu/
+
+├── inventory.ini
+
+├── deploy_app.yml
+
+├── k8s/
+
+│   ├── deployment.yml
+
+│   └── service.yml
+
+Inventory.ini
+
+
+[k8s]
+
+172.31.47.216 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/prj.pem
+
+-deploy_app.yml
+
+			---
+
+name: Deploy Application to Kubernetes Cluster
+
+hosts: k8s
+
+become: yes
+
+tasks:
+
+name: Create k8s directory on Kubernetes node
+
+file:
+
+path: /home/ubuntu/k8s
+
+state: directory
+
+mode: 0755
+
+name: Copy k8s manifests to Kubernetes node
+
+copy:
+
+src: k8s/
+
+dest: /home/ubuntu/k8s/
+
+mode: 0644
+
+name: Apply Kubernetes manifests
+
+shell: |
+
+kubectl apply -f /home/ubuntu/k8s/
+
+environment:
+
+KUBECONFIG: /home/ubuntu/.kube/config
+
+
+
+Same deployment and service file…………….do ssh and try this
+
+Pipeline:
+
+pipeline {
+
+agent any
+
+
+
+environment {
+
+    SSH_CRED    = 'instance2-ssh'
+
+    ANSIBLE_HOST = '172.31.33.121'
+
+    REMOTE_DIR   = '/home/ubuntu/regapp-cicd'
+
+}
+
+
+
+stages {
+
+
+
+    stage('Clone Code') {
+
+        steps {
+
+            git url: 'https://github.com/amagicman001/hello-world.git'
+
+        }
+
+    }
+
+
+
+    stage('Build WAR with Maven') {
+
+        steps {
+
+            sh 'mvn clean install'
+
+        }
+
+    }
+
+
+
+    stage('Copy WAR and Dockerfile to Ansible') {
+
+        steps {
+
+            sshagent(credentials: [env.SSH_CRED]) {
+
+                sh '''
+
+                    scp -o StrictHostKeyChecking=no \
+
+                        webapp/target/webapp.war \
+
+                        Dockerfile \
+
+                        ubuntu@${ANSIBLE_HOST}:${REMOTE_DIR}/
+
+                '''
+
+            }
+
+        }
+
+    }
+
+
+
+    stage('Trigger Docker Build and Push via Ansible') {
+
+        steps {
+
+            sshagent(credentials: [env.SSH_CRED]) {
+
+                sh """
+
+                    ssh ubuntu@${ANSIBLE_HOST} \
+
+                    'ansible-playbook ${REMOTE_DIR}/build-image.yml -i ${REMOTE_DIR}/hosts'
+
+                """
+
+            }
+
+        }
+
+    }
+
+
+
+    stage('Trigger Kubernetes Deployment via Ansible') {
+
+        steps {
+
+            sshagent(credentials: [env.SSH_CRED]) {
+
+                sh """
+
+                    ssh ubuntu@${ANSIBLE_HOST} \
+
+                    'ansible-playbook ${REMOTE_DIR}/deploy-k8s.yml -i ${REMOTE_DIR}/hosts'
+
+                """
+
+            }
+
+        }
+
+    }
+
+}
+
+
+
+post {
+
+    success {
+
+        echo '✅ Deployment Successful. Access your app via Kubernetes LoadBalancer!'
+
+    }
+
+    failure {
+
+        echo '❌ Deployment Failed. Please check the logs.'
+
+    }
+
+}
+
+}
+
+Ansible files:
+
+Dockerfile:
+
+FROM tomcat:latest
+
+RUN cp -R  /usr/local/tomcat/webapps.dist/*  /usr/local/tomcat/webapps
+
+COPY webapp/webapp/target/webapp.war /usr/local/tomcat/webapps/
+
+Build-image.yml:
+
+
+---
+
+name: Build and Push Docker Image
+
+hosts: docker
+
+become: yes
+
+tasks:
+
+name: Copy app files to Docker instance
+
+copy:
+
+src: /home/ubuntu/regapp-cicd/webapp
+
+dest: /home/ubuntu/webapp
+
+name: Copy Dockerfile
+
+copy:
+
+src: /home/ubuntu/regapp-cicd/Dockerfile
+
+dest: /home/ubuntu/Dockerfile
+
+name: Build Docker image
+
+shell: docker build -t amand0125/hello-world /home/ubuntu
+
+name: Login to Docker Hub
+
+shell: echo "Aman@63863" | docker login -u "amand0125" --password-stdin
+
+args:
+
+executable: /bin/bash
+
+name: Push Docker image to Docker Hub
+
+shell: docker push amand0125/hello-world
+
+
+
+DEPLOY-K8S.YMS:
+
+
+---
+
+name: Deploy App to Kubernetes
+
+hosts: k8s
+
+become: yes
+
+tasks:
+
+name: Copy deployment YAML to Kubernetes server
+
+copy:
+
+src: /home/ubuntu/regapp-cicd/regapp-deploy.yml
+
+dest: /home/ubuntu/regapp-deploy.yml
+
+name: Copy service YAML to Kubernetes server
+
+copy:
+
+src: /home/ubuntu/regapp-cicd/regapp-service.yml
+
+dest: /home/ubuntu/regapp-service.yml
+
+name: Apply Deployment
+
+shell: kubectl apply -f /home/ubuntu/regapp-deploy.yml --kubeconfig /home/ubuntu/.kube/config
+
+name: Apply Service
+
+shell: kubectl apply -f /home/ubuntu/regapp-service.yml --kubeconfig /home/ubuntu/.kube/config
+
+
+
+HOSTS:
+
+[docker]
+
+172.31.40.73 ansible_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/prj.pem
+
+[kubernetes]
+
+172.31.34.235 ansible_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/prj.pem
+
+above are all the things which are happening in my project and i need to create a 20 mins long video...please help
+
