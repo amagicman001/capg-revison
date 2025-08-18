@@ -45,3 +45,87 @@ Used Persistent Volumes for MongoDB and secured backend via secrets.
 Hosted app locally with custom domain using /etc/hosts.
 
 Hands-on with kubectl, YAML, Docker, and Minikube.
+
+
+
+
+
+
+
+
+pgAdmin Runtime Environment
+--------------------------------------------------------
+Python Path: "C:\Program Files\PostgreSQL\17\pgAdmin 4\python\python.exe"
+Runtime Config File: "C:\Users\a164\AppData\Roaming\pgadmin4\config.json"
+Webapp Path: "C:\Program Files\PostgreSQL\17\pgAdmin 4\web\pgAdmin4.py"
+pgAdmin Command: "C:\Program Files\PostgreSQL\17\pgAdmin 4\python\python.exe -s C:\Program Files\PostgreSQL\17\pgAdmin 4\web\pgAdmin4.py"
+Environment: 
+  - ALLUSERSPROFILE: C:\ProgramData
+  - APPDATA: C:\Users\a164\AppData\Roaming
+  - CommonProgramFiles: C:\Program Files\Common Files
+  - CommonProgramFiles(x86): C:\Program Files (x86)\Common Files
+  - CommonProgramW6432: C:\Program Files\Common Files
+  - COMPUTERNAME: LIN-5CG5173WBX
+  - ComSpec: C:\windows\system32\cmd.exe
+  - DriverData: C:\Windows\System32\Drivers\DriverData
+  - EFC_21884_1262719628: 1
+  - EFC_21884_1592913036: 1
+  - EFC_21884_2283032206: 0
+  - EFC_21884_2775293581: 1
+  - EFC_21884_3789132940: 1
+  - ELECTRON_ENABLE_SECURITY_WARNINGS: false
+  - FPS_BROWSER_APP_PROFILE_STRING: Internet Explorer
+  - FPS_BROWSER_USER_PROFILE_STRING: Default
+  - HOMEDRIVE: C:
+  - HOMEPATH: \Users\a164
+  - LOCALAPPDATA: C:\Users\a164\AppData\Local
+  - LOGONSERVER: \\LIN-5CG5173WBX
+  - NEXTHINK: C:\Program Files\Nexthink\Collector
+  - npm: C:\Users\a164\AppData\Roaming\npm
+  - NUMBER_OF_PROCESSORS: 12
+  - OneDrive: C:\Users\a164\OneDrive - Capgemini
+  - OneDriveCommercial: C:\Users\a164\OneDrive - Capgemini
+  - OnlineServices: Online Services
+  - ORIGINAL_XDG_CURRENT_DESKTOP: undefined
+  - OS: Windows_NT
+  - Path: C:\Program Files\PostgreSQL\17\pgAdmin 4\runtime;C:\Program Files\Eclipse Adoptium\jdk-21.0.4.7-hotspot\bin;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files\ServiceNow\agent-client-collector\bin;C:\Program Files\ServiceNow\agent-client-collector\embedded\bin;C:\Program Files\nodejs\;C:\Users\a164\AppData\Roaming\npm;C:\Users\a164\AppData\Local\Microsoft\WindowsApps;C:\Users\a164\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\a164\AppData\Roaming\npm;
+  - PATHEXT: .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+  - PGADMIN_INT_KEY: 0ce4cd2c-3497-457e-b793-d45537ae7509
+  - PGADMIN_INT_PORT: 5432
+  - PGADMIN_SERVER_MODE: OFF
+  - platformcode: AN
+  - PROCESSOR_ARCHITECTURE: AMD64
+  - PROCESSOR_IDENTIFIER: AMD64 Family 25 Model 124 Stepping 0, AuthenticAMD
+  - PROCESSOR_LEVEL: 25
+  - PROCESSOR_REVISION: 7c00
+  - ProgramData: C:\ProgramData
+  - ProgramFiles: C:\Program Files
+  - ProgramFiles(x86): C:\Program Files (x86)
+  - ProgramW6432: C:\Program Files
+  - PSModulePath: C:\Program Files\WindowsPowerShell\Modules;C:\windows\system32\WindowsPowerShell\v1.0\Modules
+  - PUBLIC: C:\Users\Public
+  - RegionCode: APJ
+  - SESSIONNAME: Console
+  - SN_AGENT_HOME_DIR: C:\Program Files\ServiceNow\agent-client-collector\
+  - SystemDrive: C:
+  - SystemRoot: C:\windows
+  - TEMP: C:\Users\a164\AppData\Local\Temp
+  - TMP: C:\Users\a164\AppData\Local\Temp
+  - USERDNSDOMAIN: corp.capgemini.com
+  - USERDOMAIN: CORP
+  - USERDOMAIN_ROAMINGPROFILE: CORP
+  - USERNAME: a164
+  - USERPROFILE: C:\Users\a164
+  - windir: C:\windows
+--------------------------------------------------------
+
+Total spawn time to start the pgAdmin4 server: 0.142 Sec
+Traceback (most recent call last):
+
+  File "C:\Program Files\PostgreSQL\17\pgAdmin 4\web\pgAdmin4.py", line 38, in <module>
+    import config
+  File "C:\Program Files\PostgreSQL\17\pgAdmin 4\web\config.py", line 33, in <module>
+    from pgadmin.utils import env, IS_WIN, fs_short_path
+ModuleNotFoundError: No module named 'pgadmin'
+
+
