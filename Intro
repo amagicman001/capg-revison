@@ -128,4 +128,4 @@ Traceback (most recent call last):
     from pgadmin.utils import env, IS_WIN, fs_short_path
 ModuleNotFoundError: No module named 'pgadmin'
 
-
+https://harshdevopss.hashnode.dev/step-by-step-guide-to-deploying-a-chat-application-on-kubernetes-using-minikube
