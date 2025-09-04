@@ -1,0 +1,295 @@
+---
+
+🌱 Spring & Spring Boot – Structured Notes
+
+1. What is Spring?
+
+Spring is a Java framework used to build enterprise-level applications.
+
+It provides loose coupling through Dependency Injection (DI) and supports modular development.
+
+The Inversion of Control (IoC) container manages object creation and their lifecycles.
+
+
+🔑 Core Concepts of Spring
+
+1. Dependency Injection (DI)
+
+Definition: Injecting objects into a class instead of creating them manually.
+
+Managed by the IoC container.
+
+Classes annotated with @Component, @Service, @Repository, etc. are registered as beans.
+
+
+
+2. Inversion of Control (IoC)
+
+Instead of the developer controlling object creation, the framework controls it.
+
+This is called externalization of control → shifting control from developer → framework.
+
+
+
+3. Bean
+
+An object managed by the IoC container.
+
+Defined either via annotations (@Component, @Bean) or XML (legacy).
+
+
+
+4. ApplicationContext
+
+The implementation of the IoC container.
+
+Responsible for loading bean definitions, wiring them, and managing their lifecycle.
+
+
+
+
+
+---
+
+2. What is Spring Boot?
+
+Spring Boot is a framework built on top of Spring.
+
+It simplifies application setup by removing boilerplate configuration.
+
+
+Why Spring Boot?
+
+Auto-configuration → automatically configures beans based on dependencies.
+
+Embedded servers → ships with Tomcat, Jetty, Undertow (no need to deploy WAR separately).
+
+Starter dependencies → bundles required libraries (e.g., spring-boot-starter-web).
+
+Production-ready features → health checks, monitoring with Actuator.
+
+Convention over configuration → sensible defaults, minimal XML.
+
+
+
+---
+
+3. Architecture of Spring & Spring Boot
+
+Spring Architecture (Layered)
+
+1. Core Container
+
+Beans, Core, Context, Expression Language.
+
+
+
+2. Data Access Layer
+
+JDBC, ORM, Transactions.
+
+
+
+3. Web Layer
+
+Web, WebMVC, WebSocket.
+
+
+
+4. AOP Layer
+
+Aspect-Oriented Programming.
+
+
+
+5. Integration Layer
+
+Messaging, Scheduling, Email.
+
+
+
+
+Spring Boot Architecture
+
+Spring Boot Starter → brings all dependencies.
+
+Auto Configuration → sets up beans automatically.
+
+Spring Boot CLI → run apps from command line.
+
+Embedded Server (Tomcat/Jetty/Undertow).
+
+Spring Actuator → monitoring endpoints.
+
+
+
+---
+
+4. Structure of a Spring Boot Project
+
+project-root
+│── pom.xml                 # Maven build file: dependencies, plugins
+│── .gitignore              # ignored files for Git
+│── HELP.md                 # documentation
+│── .idea                   # IDE-specific configs
+│── .mvn                    # Maven wrapper files
+│── mvnw, mvnw.cmd          # Maven wrapper executables
+│
+└── src
+    ├── main
+    │   ├── java            # application code
+    │   │    └── com.example.demo (packages)
+    │   └── resources
+    │        ├── static     # static files (images, CSS, JS)
+    │        ├── templates  # HTML files (Thymeleaf, etc.)
+    │        └── application.properties/yml # configurations
+    │
+    └── test                # test cases
+
+
+---
+
+5. Important Annotations in Spring Boot
+
+Stereotype Annotations (marking beans)
+
+@Component → generic component.
+
+@Service → service layer.
+
+@Repository → persistence/DAO layer.
+
+@Controller → handles web requests (MVC).
+
+@RestController → @Controller + @ResponseBody.
+
+
+Bean & Config Annotations
+
+@Bean → explicitly define a bean.
+
+@Configuration → marks a class that provides beans.
+
+@Value → inject values from properties.
+
+@PropertySource → load external property files.
+
+
+Dependency Injection Annotations
+
+@Autowired → injects dependencies.
+
+@Qualifier → specify bean when multiple exist.
+
+@Primary → default bean when multiple candidates.
+
+
+Boot-Specific
+
+@SpringBootApplication → main entry point (combines @Configuration, @EnableAutoConfiguration, @ComponentScan).
+
+@EnableAutoConfiguration → triggers auto-configuration.
+
+@ComponentScan → scans for beans in packages.
+
+
+
+---
+
+6. REST & Endpoints
+
+Web Services
+
+Definition: Communication mechanism between two applications over a network.
+
+
+REST (Representational State Transfer)
+
+Uses HTTP methods (GET, POST, PUT, DELETE).
+
+Data formats → JSON, XML.
+
+
+REST in Spring Boot
+
+@RestController → defines REST endpoints.
+
+@GetMapping, @PostMapping, @PutMapping, @DeleteMapping → HTTP mappings.
+
+ResponseEntity → build custom responses.
+
+
+
+---
+
+7. Spring Boot Features
+
+1. Spring Boot Starter
+
+Predefined set of dependencies.
+
+Examples:
+
+spring-boot-starter-web → build web apps.
+
+spring-boot-starter-data-jpa → database access.
+
+spring-boot-starter-test → testing.
+
+
+
+
+2. Actuator
+
+Provides production-ready features.
+
+Endpoints like /actuator/health, /actuator/metrics.
+
+
+
+3. Build & Packaging
+
+Uses Maven/Gradle for build.
+
+Produces JAR/WAR with embedded server.
+
+
+
+
+
+---
+
+8. Maven Basics (since Spring Boot is Maven-heavy)
+
+pom.xml → Project Object Model (dependencies, plugins, build config).
+
+Maven lifecycle: clean → compile → test → package → install → deploy.
+
+Maven Wrapper → ensures correct Maven version across systems.
+
+
+
+---
+
+✅ Missing but Important Concepts Before Deep-Diving into Spring Boot
+
+Profiles (@Profile) → switch configurations for dev/test/prod.
+
+YAML config (application.yml) → more structured than .properties.
+
+Exception handling → @ControllerAdvice, @ExceptionHandler.
+
+Validation → @Valid, @NotNull, @Size.
+
+Logging → built-in with SLF4J + Logback.
+
+Testing → JUnit + SpringBootTest.
+
+
+
+---
+
+⚡ Now you’ve got a clean, hierarchical, keyword-rich cheat sheet that uses your raw notes as the backbone but actually makes sense for interviews and learning.
+
+Do you want me to also map these into interview-style Q&A (like “What is IoC?”, “What does @Component do?”) so you can use them as flashcards?
+
